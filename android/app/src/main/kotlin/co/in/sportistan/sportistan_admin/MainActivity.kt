@@ -1,0 +1,6 @@
+package co.`in`.sportistan.sportistan_admin
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity() {
+}
