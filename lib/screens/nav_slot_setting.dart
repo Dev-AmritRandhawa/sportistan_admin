@@ -49,6 +49,7 @@ class _NavSlotSettingsState extends State<NavSlotSettings> {
   void initState() {
     onwards = widget.onwards;
     onwardsList.add(widget.onwards);
+    getSlots();
     super.initState();
   }
 

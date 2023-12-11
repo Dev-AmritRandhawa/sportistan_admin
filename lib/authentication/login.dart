@@ -86,7 +86,10 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     try {
       await db
           .signInWithEmailAndPassword(email: email, password: password)
-          .then((value) => {PageRouter.pushRemoveUntil(context, const Home())});
+          .then((value) => {
+                TextInput.finishAutofillContext(),
+                PageRouter.pushRemoveUntil(context, const Home())
+              });
     } on FirebaseAuthException catch (e) {
       passwordController.clear();
       serverConnect.value = false;
@@ -214,7 +217,6 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                 onPressed: () {
                   if (_emailKey.currentState!.validate() &
                       _passwordKey.currentState!.validate()) {
-                    TextInput.finishAutofillContext();
                     login(emailController.value.text.trim(),
                         passwordController.value.text.trim());
                   }

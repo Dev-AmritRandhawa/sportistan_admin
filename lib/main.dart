@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
@@ -25,13 +27,11 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-
   @override
   Widget build(BuildContext context) {
-
-    return  MaterialApp(
+    return MaterialApp(
       theme: ThemeData.light(useMaterial3: false),
-themeMode: ThemeMode.light,
+      themeMode: ThemeMode.light,
       home: const MyHomePage(),
     );
   }
@@ -65,41 +65,46 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback(
-        (_) => Future.delayed(const Duration(milliseconds: 3000), () async {
-              if (_auth.currentUser != null) {
-                try {
-                  PageRouter.pushRemoveUntil(context, const Home());
-                } catch (e) {
-                  return e;
-                }
-              } else {
-                PageRouter.pushRemoveUntil(context, const Login());
+            (_) => Future.delayed(const Duration(milliseconds: 2000), () async {
+          _auth.authStateChanges().listen((User? user) async {
+            if (user != null) {
+              try {
+
+              } on SocketException catch (e) {
+
+              } catch (e) {
               }
-            }));
+            } else {
+
+            }
+          });
+        }));
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Lottie.asset(
-              'assets/loading.json',
-              controller: _controller,
-              onLoaded: (composition) {
-                _controller
-                  ..duration = composition.duration
-                  ..repeat();
-              },
-            ),
-            Image.asset("assets/logo.png",
-                height: MediaQuery.of(context).size.height / 8),
-            const Text("Admin Console", style: TextStyle(fontFamily: "DMSans")),
-            const CircularProgressIndicator(
-              color: Colors.green,
-              strokeWidth: 1,
-            )
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Lottie.asset(
+                'assets/loading.json',
+                controller: _controller,
+                onLoaded: (composition) {
+                  _controller
+                    ..duration = composition.duration
+                    ..repeat();
+                },
+              ),
+              Image.asset("assets/logo.png",
+                  height: MediaQuery.of(context).size.height / 8),
+              const Text("Admin Console",
+                  style: TextStyle(fontFamily: "DMSans")),
+              const CircularProgressIndicator(
+                color: Colors.green,
+                strokeWidth: 1,
+              )
+            ],
+          ),
         ),
       ),
     );

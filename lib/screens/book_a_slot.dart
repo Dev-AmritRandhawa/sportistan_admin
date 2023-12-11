@@ -1192,7 +1192,7 @@ class _BookASlotState extends State<BookASlot> {
               .doc(refDetails.docs.first.id)
               .update({
             'slotTime': widget.slotTime,
-            'bookingPerson': 'Ground Owner',
+            'bookingPerson': 'Sportistan Admin',
             'groundName': widget.groundName,
             'bookingCreated': DateTime.parse(widget.date),
             'bookedAt': DateTime.now(),
