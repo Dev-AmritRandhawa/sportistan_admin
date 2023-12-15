@@ -398,7 +398,7 @@ class _AccountKYCState extends State<AccountKYC> {
                                           children: [
                                             Text(
                                                 snapshot
-                                                    .data!.docChanges.first.doc
+                                                    .data!.docChanges[index].doc
                                                     .get('name'),
                                                 style: const TextStyle(
                                                     fontSize: 14)),
@@ -406,8 +406,7 @@ class _AccountKYCState extends State<AccountKYC> {
                                               onPressed: () {
                                                 FlutterPhoneDirectCaller
                                                     .callNumber(
-                                                  snapshot.data!.docChanges
-                                                      .first.doc
+                                                  snapshot.data!.docChanges[index].doc
                                                       .get('phoneNumber'),
                                                 );
                                               },
@@ -593,12 +592,9 @@ class _AccountKYCState extends State<AccountKYC> {
       String folderName) async {
     final Reference storageRef = FirebaseStorage.instance
         .ref()
-        .child(snapshot.data!.docChanges.first.doc.get('userID') + folderName);
-
+        .child(snapshot.data!.docChanges[0].doc.get('userID') + folderName);
     try {
       ListResult result = await storageRef.listAll();
-
-      // Delete each file in the folder
       await Future.forEach(result.items, (Reference item) async {
         await item.delete();
       });

@@ -635,8 +635,14 @@ class _BookingInfoState extends State<BookingInfo> {
                     },
                   );
                 } else {
-                  return const CircularProgressIndicator(
-                    strokeWidth: 1,
+                  return const Center(
+                    child: Column(
+                      children: [
+                        CircularProgressIndicator(
+                          strokeWidth: 1,
+                        ),
+                      ],
+                    ),
                   );
                 }
               },
@@ -659,8 +665,7 @@ class _BookingInfoState extends State<BookingInfo> {
         final imagePath = await File('${directory.path}/image.png').create();
         await imagePath.writeAsBytes(image);
         await Share.shareFiles([imagePath.path],
-            text:
-                'Download Sportistan App for Your Sports Facility Booking https://www.sportistan.co.in/');
+            text: 'Download Sportistan App for Your Sports Facility Booking https://www.sportistan.co.in/');
       }
     });
   }

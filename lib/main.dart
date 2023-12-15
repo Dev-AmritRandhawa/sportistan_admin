@@ -10,7 +10,7 @@ import 'package:lottie/lottie.dart';
 import 'package:sportistan_admin/authentication/login.dart';
 import 'package:sportistan_admin/firebase_options.dart';
 import 'package:sportistan_admin/home/home.dart';
-import 'package:sportistan_admin/widgets/page_router.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,47 +66,61 @@ class _MyHomePageState extends State<MyHomePage>
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback(
             (_) => Future.delayed(const Duration(milliseconds: 2000), () async {
-          _auth.authStateChanges().listen((User? user) async {
-            if (user != null) {
-              try {
+        }).then((value) => {
+        if(mounted){
+          check()
 
-              } on SocketException catch (e) {
+        }
 
-              } catch (e) {
-              }
-            } else {
-
-            }
-          });
-        }));
+            }));
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Lottie.asset(
-                'assets/loading.json',
-                controller: _controller,
-                onLoaded: (composition) {
-                  _controller
-                    ..duration = composition.duration
-                    ..repeat();
-                },
-              ),
-              Image.asset("assets/logo.png",
-                  height: MediaQuery.of(context).size.height / 8),
-              const Text("Admin Console",
-                  style: TextStyle(fontFamily: "DMSans")),
-              const CircularProgressIndicator(
-                color: Colors.green,
-                strokeWidth: 1,
-              )
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Lottie.asset(
+              'assets/loading.json',
+              controller: _controller,
+              onLoaded: (composition) {
+                _controller
+                  ..duration = composition.duration
+                  ..repeat();
+              },
+            ),
+            Image.asset("assets/logo.png",
+                height: MediaQuery.of(context).size.height / 8),
+            const Text("Admin Console",
+                style: TextStyle(fontFamily: "DMSans")),
+            const CircularProgressIndicator(
+              color: Colors.green,
+              strokeWidth: 1,
+            )
+          ],
         ),
       ),
     );
+  }
+
+  Future<void> check() async {
+      if (_auth.currentUser != null) {
+        if(Platform.isAndroid){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Home(),));
+        }
+        if(Platform.isIOS){
+          Navigator.pushReplacement(context, CupertinoPageRoute(builder: (context) => const Home(),));
+        }
+
+      } else {
+        if(Platform.isAndroid){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login(),));
+        }
+        if(Platform.isIOS){
+          Navigator.pushReplacement(context, CupertinoPageRoute(builder: (context) => const Login(),));
+        }
+
+      }
+
   }
 }

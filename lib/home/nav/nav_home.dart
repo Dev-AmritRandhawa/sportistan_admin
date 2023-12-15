@@ -1,13 +1,11 @@
 import 'package:chips_choice/chips_choice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delayed_display/delayed_display.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:sportistan_admin/authentication/login.dart';
+import 'package:sportistan_admin/home/nav/booking_entireday_info.dart';
 import 'package:sportistan_admin/home/nav/booking_info.dart';
 import 'package:sportistan_admin/widgets/page_router.dart';
-import 'booking_entireday_info.dart';
 
 class Bookings extends StatefulWidget {
   const Bookings({super.key});
@@ -18,24 +16,16 @@ class Bookings extends StatefulWidget {
 
 class _BookingsState extends State<Bookings> {
   final _server = FirebaseFirestore.instance;
-
+  DateTime dateTime = DateTime.now();
   ValueNotifier<bool> showFilter = ValueNotifier<bool>(false);
-
   var options = [
     "Today",
     "Yesterday",
     "Tomorrow",
     "Past 30 Days",
-    "Upcoming 30 Days"
+    "Next 30 Days"
   ];
   var tag = 0;
-  var options2 = [
-    "Both",
-    "Entire Day",
-    "Single Bookings",
-  ];
-  var tag2 = 0;
-
   var options3 = [
     'Cricket',
     'Football',
@@ -45,437 +35,434 @@ class _BookingsState extends State<Bookings> {
     'Volleyball',
     'Swimming',
   ];
-
   var tag3 = 0;
+  var filterDuplicate = [];
+  ValueNotifier<bool> bookingDataListener = ValueNotifier<bool>(false);
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    streamOfBookings();
+    super.initState();
+  }
+
+  List<BookingsData> bookingData = [];
+  List<dynamic> allSlotsRef = [];
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData.light(useMaterial3: false),
-      home: Scaffold(
-          body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Scaffold(
+        body: SafeArea(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
                 children: [
-                  IconButton(
-                      onPressed: () {
-                        FirebaseAuth.instance
-                            .signOut()
-                            .then((value) => {
-                          PageRouter.pushRemoveUntil(context, const Login())
-                        });
-                      },
-                      icon: const CircleAvatar(
-                          backgroundColor: Colors.red,
-                          child: Icon(
-                            Icons.power_settings_new_rounded,
-                            color: Colors.white,
-                          ))),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text("Bookings",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: "DMSans",
-                          fontSize: MediaQuery.of(context).size.height / 25,
-                        ) //TextStyle
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Icon(Icons.calendar_today, color: Colors.black),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text("Bookings",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "DMSans",
+                              fontSize: MediaQuery.of(context).size.height / 25,
+                            ) //TextStyle),
                         ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              ValueListenableBuilder(
-                valueListenable: showFilter,
-                builder: (context, value, child) => value
-                    ? DelayedDisplay(
+                  ValueListenableBuilder(
+                    valueListenable: showFilter,
+                    builder: (context, value, child) => value
+                        ? DelayedDisplay(
+                      child: Column(
+                        children: [
+                          ContentNew(
+                            title: 'Select Time Range',
+                            child: ChipsChoice<int>.single(
+                              value: tag,
+                              onChanged: (val) {
+                                setState(() {
+                                  tag = val;
+                                  streamOfBookings();
+                                });
+                              },
+                              choiceItems: C2Choice.listFrom<int, String>(
+                                source: options,
+                                value: (i, v) => i,
+                                label: (i, v) => v,
+                                tooltip: (i, v) => v,
+                              ),
+                              choiceStyle: C2ChipStyle.toned(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(5),
+                                ),
+                              ),
+                              wrapped: true,
+                            ),
+                          ),
+                          ContentNew(
+                            title: 'Sports Type',
+                            child: ChipsChoice<int>.single(
+                              value: tag3,
+                              onChanged: (val) => setState(() {
+                                tag3 = val;
+                                streamOfBookings();
+                              }),
+                              choiceItems: C2Choice.listFrom<int, String>(
+                                source: options3,
+                                value: (i, v) => i,
+                                label: (i, v) => v,
+                                tooltip: (i, v) => v,
+                              ),
+                              choiceStyle: C2ChipStyle.toned(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(5),
+                                ),
+                              ),
+                              wrapped: true,
+                            ),
+                          ),
+                          Card(
+                            color: Colors.red.shade400,
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text("   Close Filter Tray",
+                                      style: TextStyle(color: Colors.white)),
+                                  IconButton(
+                                      onPressed: () {
+                                        showFilter.value = false;
+                                      },
+                                      icon: const Icon(
+                                        Icons.clear,
+                                        color: Colors.white,
+                                      )),
+                                ]),
+                          )
+                        ],
+                      ),
+                    )
+                        : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.only(left: 15.0),
+                            child: Text(
+                              "Filter",
+                              style:
+                              TextStyle(fontFamily: "DMSans", fontSize: 18),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 15),
+                            child: CircleAvatar(
+                              child: IconButton(
+                                  onPressed: () {
+                                    showFilter.value = true;
+                                  },
+                                  icon: const Icon(Icons.filter_alt_outlined)),
+                            ),
+                          )
+                        ]),
+                  ),
+                  const Divider(),
+                  ValueListenableBuilder(
+                    valueListenable: bookingDataListener,
+                    builder: (context, value, child) {
+                      return value
+                          ? bookingData.isEmpty
+                          ? const Center(
                         child: Column(
                           children: [
-                            ContentNew(
-                              child: ChipsChoice<int>.single(
-                                value: tag,
-                                onChanged: (val) => setState(() {
-                                  tag = val;
-                                  createFilterIsGreaterThan(val);
-                                  createFilterIsLessThan(val);
-                                }),
-                                choiceItems: C2Choice.listFrom<int, String>(
-                                  source: options,
-                                  value: (i, v) => i,
-                                  label: (i, v) => v,
-                                  tooltip: (i, v) => v,
-                                ),
-                                choiceStyle: C2ChipStyle.toned(
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(5),
-                                  ),
-                                ),
-                                wrapped: true,
-                              ),
+                            Icon(
+                              Icons.error,
+                              color: Colors.orange,
+                              size: 50,
                             ),
-                            ContentNew(
-                              child: ChipsChoice<int>.single(
-                                value: tag2,
-                                onChanged: (val) => setState(() {
-                                  tag2 = val;
-                                }),
-                                choiceItems: C2Choice.listFrom<int, String>(
-                                  source: options2,
-                                  value: (i, v) => i,
-                                  label: (i, v) => v,
-                                  tooltip: (i, v) => v,
-                                ),
-                                choiceStyle: C2ChipStyle.toned(
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(5),
-                                  ),
-                                ),
-                                wrapped: true,
-                              ),
-                            ),
-                            ContentNew(
-                              child: ChipsChoice<int>.single(
-                                value: tag3,
-                                onChanged: (val) => setState(() {
-                                  tag3 = val;
-                                }),
-                                choiceItems: C2Choice.listFrom<int, String>(
-                                  source: options3,
-                                  value: (i, v) => i,
-                                  label: (i, v) => v,
-                                  tooltip: (i, v) => v,
-                                ),
-                                choiceStyle: C2ChipStyle.toned(
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(5),
-                                  ),
-                                ),
-                                wrapped: true,
-                              ),
-                            ),
-                            Card(
-                              color: Colors.red.shade400,
-                              child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text("   Close Filter Tray",
-                                        style: TextStyle(color: Colors.white)),
-                                    IconButton(
-                                        onPressed: () {
-                                          showFilter.value = false;
-                                        },
-                                        icon: const Icon(
-                                          Icons.clear,
-                                          color: Colors.white,
-                                        )),
-                                  ]),
-                            )
+                            Text(" No Bookings",
+                                style: TextStyle(
+                                    fontFamily: "DMSans",
+                                    fontSize: 22,
+                                    color: Colors.orange)),
                           ],
                         ),
                       )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          : Column(
                         children: [
-                            const Padding(
-                              padding: EdgeInsets.only(left: 15.0),
-                              child: Text(
-                                "Filter",
-                                style: TextStyle(
-                                    fontFamily: "DMSans", fontSize: 18),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 15),
-                              child: CircleAvatar(
-                                child: IconButton(
-                                    onPressed: () {
-                                      showFilter.value = true;
+                          ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: bookingData.length,
+                              itemBuilder: (context, index) {
+                                int bookingIndex = index + 1;
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: InkWell(
+                                    onTap: bookingData[index]
+                                        .isBookingCancelled
+                                        ? null
+                                        : () {
+                                      checkBookingType(
+                                          entireDayBooked:
+                                          bookingData[index]
+                                              .entireDayBooking,
+                                          bookingID: bookingData[index]
+                                              .bookingID);
                                     },
-                                    icon:
-                                        const Icon(Icons.filter_alt_outlined)),
-                              ),
-                            )
-                          ]),
-              ),
-              const Divider(),
-              StreamBuilder<QuerySnapshot>(
-                  stream: _server
-                      .collection("GroundBookings")
-                      .where("bookingCreated",
-                          isGreaterThanOrEqualTo:
-                              createFilterIsGreaterThan(tag))
-                      .where("bookingCreated",
-                          isLessThanOrEqualTo: createFilterIsLessThan(tag))
-                      .where('groundType',
-                          isEqualTo: createFilterForSportsType(tag3))
-                      .where('entireDayBooking',
-                          whereIn: createFilterForBookingType(tag2))
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    return snapshot.hasData
-                        ? snapshot.data!.size != 0
-                            ? ListView.builder(
-                                physics: const BouncingScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: snapshot.data!.docs.length,
-                                itemBuilder: (context, index) {
-                                  DocumentSnapshot doc =
-                                      snapshot.data!.docs[index];
-                                  DateTime dt =
-                                      (doc['bookedAt'] as Timestamp).toDate();
-                                  String bookedDate =
-                                      DateFormat.yMMMMEEEEd().format(dt);
-                                  List<dynamic> allSlotsRef = [];
-                                  if (doc['entireDayBooking']) {
-                                    allSlotsRef = doc['includeSlots'];
-                                  }
-                                  int bookingIndex = index + 1;
-                                  return Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: InkWell(
-                                      onTap: () {
-                                        checkBookingType(
-                                            entireDayBooked:
-                                                doc['entireDayBooking'],
-                                            bookingID: doc['bookingID']);
-                                      },
-                                      child: Card(
-                                        color: Colors.grey.shade50,
-                                        child: Column(
-                                          children: [
-                                            CircleAvatar(
-                                                backgroundColor:
-                                                    doc['isBookingCancelled']
-                                                        ? Colors.red
-                                                        : Colors.green,
-                                                child: Text(
-                                                  bookingIndex.toString(),
+                                    child: Card(
+                                      color: Colors.grey.shade50,
+                                      child: Column(
+                                        children: [
+                                          CircleAvatar(
+                                              backgroundColor:
+                                              bookingData[index]
+                                                  .isBookingCancelled
+                                                  ? Colors.red
+                                                  : Colors.green,
+                                              child: Text(
+                                                bookingIndex.toString(),
+                                                style: const TextStyle(
+                                                    color: Colors.white),
+                                              )),
+                                          const Text(
+                                            "Booked by",
+                                            style: TextStyle(
+                                                fontFamily: "DMSans",
+                                                color: Colors.black45),
+                                          ),
+                                          Text(
+                                            bookingData[index].bookingPerson,
+                                            style: const TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.black87,
+                                                fontFamily: "DMSans",
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          bookingData[index]
+                                              .isBookingCancelled
+                                              ? const Text(
+                                            "Cancelled",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.red,
+                                                fontFamily: "DMSans",
+                                                fontWeight:
+                                                FontWeight.bold),
+                                          )
+                                              : Container(),
+                                          Padding(
+                                            padding:
+                                            const EdgeInsets.all(8.0),
+                                            child: Text(
+                                                bookingData[index].groundName,
+                                                style: const TextStyle(
+                                                    fontFamily: "DMSans"),softWrap: true),
+                                          ),
+                                          Card(
+                                            child: Padding(
+                                              padding:
+                                              const EdgeInsets.all(8.0),
+                                              child: Text(
+                                                  bookingData[index]
+                                                      .groundType,
                                                   style: const TextStyle(
-                                                      color: Colors.white),
-                                                )),
-                                            Row(
-                                              children: [
-                                                Card(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        50)),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: Text(
-                                                          doc['groundType']),
-                                                    ))
-                                              ],
+                                                      fontFamily: "DMSans")),
                                             ),
-                                            const Text(
-                                              "Booked by",
-                                              style: TextStyle(
-                                                  fontFamily: "DMSans",
-                                                  color: Colors.black45),
-                                            ),
-                                            Text(
-                                              doc["bookingPerson"],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                            children: [
+                                              const Text("Paid : ",
+                                                  style: TextStyle(
+                                                      fontFamily: 'DMSans',
+                                                      color: Colors.green)),
+                                              Text(
+                                                  DateFormat.yMEd()
+                                                      .format(
+                                                      bookingData[index]
+                                                          .bookedDate)
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                    color: Colors.black45,
+                                                  )),
+                                              Text(
+                                                  ' ${DateFormat.jms().format(bookingData[index].bookedDate)}',
+                                                  style: const TextStyle(
+                                                    color: Colors.black45,
+                                                  )),
+                                            ],
+                                          ),
+                                          bookingData[index].entireDayBooking
+                                              ? Card(
+                                              color: Colors.indigo,
+                                              child: Padding(
+                                                padding:
+                                                const EdgeInsets.all(
+                                                    8.0),
+                                                child: Text(
+                                                    "Entire Day Booked - ${DateFormat.yMMMMEEEEd().format(bookingData[index].bookingCreated)}",
+                                                    style:
+                                                    const TextStyle(
+                                                        color: Colors
+                                                            .white)),
+                                              ))
+                                              : Container(),
+                                          bookingData[index].entireDayBooking
+                                              ? Container()
+                                              : ListTile(
+                                            title: Text(
+                                                bookingData[index]
+                                                    .slotTime,
+                                                style: const TextStyle(
+                                                    fontSize: 25)),
+                                            subtitle: Text(
+                                              DateFormat.yMMMMEEEEd()
+                                                  .format(bookingData[
+                                              index]
+                                                  .bookingCreated),
                                               style: const TextStyle(
-                                                  fontSize: 18,
-                                                  color: Colors.black87,
                                                   fontFamily: "DMSans",
-                                                  fontWeight: FontWeight.bold),
+                                                  fontSize: 20),
                                             ),
-                                            doc['entireDayBooking']
-                                                ? Card(
-                                                    color: Colors.indigo,
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      child: Text(
-                                                          "Entire Day Booked - ${DateFormat.yMMMMEEEEd().format(DateTime.parse(doc["group"]))}",
-                                                          style:
-                                                              const TextStyle(
-                                                                  color: Colors
-                                                                      .white)),
-                                                    ))
-                                                : Container(),
-                                            doc["isBookingCancelled"]
-                                                ? const Text(
-                                                    "Cancelled",
+                                            trailing: const Icon(
+                                                Icons.info_outline),
+                                          ),
+                                          bookingData[index].entireDayBooking
+                                              ? Container()
+                                              : Row(
+                                            children: [
+                                              Padding(
+                                                padding:
+                                                const EdgeInsets
+                                                    .all(8.0),
+                                                child: Text(
+                                                    '(${bookingData[index].slotStatus})',
                                                     style: TextStyle(
-                                                        fontSize: 18,
-                                                        color: Colors.red,
-                                                        fontFamily: "DMSans",
+                                                        fontSize: 15,
                                                         fontWeight:
-                                                            FontWeight.bold),
-                                                  )
-                                                : Container(),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                const Text("Booked at : "),
-                                                Text(bookedDate,
-                                                    style: const TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
-                                              ],
-                                            ),
-                                            const Row(
-                                              children: [
-                                                Text("   Booking Details",
-                                                    style: TextStyle(
-                                                        fontFamily: "DMSans")),
-                                              ],
-                                            ),
-                                            doc['entireDayBooking']
-                                                ? Container()
-                                                : ListTile(
-                                                    title: Text(doc["slotTime"],
-                                                        style: const TextStyle(
-                                                            fontSize: 20)),
-                                                    subtitle: Text(DateFormat
-                                                            .yMMMMEEEEd()
-                                                        .format(DateTime.parse(
-                                                            doc["group"]))),
-                                                    trailing: const Icon(Icons
-                                                        .arrow_forward_ios),
-                                                  ),
-                                            doc['entireDayBooking']
-                                                ? Container()
-                                                : Row(
-                                                    children: [
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child: Text(
-                                                            '(${doc["slotStatus"]})',
-                                                            style: TextStyle(
-                                                                fontSize: 15,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: setStatusColor(doc[
-                                                                    "slotStatus"]),
-                                                                fontFamily:
-                                                                    "DMSans")),
+                                                        FontWeight
+                                                            .bold,
+                                                        color: setStatusColor(
+                                                            bookingData[
+                                                            index]
+                                                                .slotStatus),
+                                                        fontFamily:
+                                                        "DMSans")),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                const EdgeInsets
+                                                    .all(8.0),
+                                                child: bookingData[
+                                                index]
+                                                    .feesDue ==
+                                                    0
+                                                    ? const Text(
+                                                  "Paid",
+                                                  style: TextStyle(
+                                                      color: Colors
+                                                          .green),
+                                                )
+                                                    : Row(
+                                                  children: [
+                                                    Text(
+                                                      "Due Amount : Rs.",
+                                                      style:
+                                                      TextStyle(
+                                                        color: Colors
+                                                            .red
+                                                            .shade200,
                                                       ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
-                                                        child:
-                                                            doc["feesDue"] == 0
-                                                                ? const Text(
-                                                                    "Paid",
-                                                                    style: TextStyle(
-                                                                        color: Colors
-                                                                            .green),
-                                                                  )
-                                                                : Row(
-                                                                    children: [
-                                                                      Text(
-                                                                        "Due Amount : Rs.",
-                                                                        style:
-                                                                            TextStyle(
-                                                                          color: Colors
-                                                                              .red
-                                                                              .shade200,
-                                                                        ),
-                                                                      ),
-                                                                      Text(
-                                                                          doc["feesDue"]
-                                                                              .toString(),
-                                                                          style: TextStyle(
-                                                                              color: Colors.red.shade200,
-                                                                              fontSize: 15,
-                                                                              fontFamily: "DMSans")),
-                                                                    ],
-                                                                  ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                            doc.get('entireDayBooking')
-                                                ? SizedBox(
-                                                    width: double.infinity,
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height /
-                                                            15,
-                                                    child: ListView.builder(
-                                                      scrollDirection:
-                                                          Axis.horizontal,
-                                                      shrinkWrap: true,
-                                                      itemCount:
-                                                          allSlotsRef.length,
-                                                      itemBuilder:
-                                                          (context, index) {
-                                                        return Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8.0),
-                                                          child: OutlinedButton(
-                                                              onPressed: null,
-                                                              child: Text(
-                                                                  allSlotsRef[
-                                                                          index]
-                                                                      .toString())),
-                                                        );
-                                                      },
                                                     ),
-                                                  )
-                                                : Container(),
-                                          ],
-                                        ),
+                                                    Text(
+                                                        bookingData[
+                                                        index]
+                                                            .feesDue
+                                                            .toString(),
+                                                        style: TextStyle(
+                                                            color: Colors
+                                                                .red
+                                                                .shade200,
+                                                            fontSize:
+                                                            15,
+                                                            fontFamily:
+                                                            "DMSans")),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          bookingData[index].entireDayBooking
+                                              ? SizedBox(
+                                            width: double.infinity,
+                                            height:
+                                            MediaQuery.of(context)
+                                                .size
+                                                .height /
+                                                15,
+                                            child: ListView.builder(
+                                              scrollDirection:
+                                              Axis.horizontal,
+                                              shrinkWrap: true,
+                                              itemCount:
+                                              bookingData[index]
+                                                  .allSlotsRef
+                                                  .length,
+                                              itemBuilder:
+                                                  (context, count) {
+                                                return Padding(
+                                                  padding:
+                                                  const EdgeInsets
+                                                      .all(8.0),
+                                                  child: OutlinedButton(
+                                                      onPressed: null,
+                                                      child: Text(bookingData[
+                                                      index]
+                                                          .allSlotsRef[
+                                                      count]
+                                                          .toString())),
+                                                );
+                                              },
+                                            ),
+                                          )
+                                              : Container(),
+                                        ],
                                       ),
                                     ),
-                                  );
-                                })
-                            : Column(
-                                children: [
-                                  const Center(
-                                      child: Padding(
-                                    padding: EdgeInsets.all(8.0),
-                                    child: Text(
-                                      "No Booking Found",
-                                      style: TextStyle(
-                                          color: Colors.black38,
-                                          fontFamily: "DMSans"),
-                                    ),
-                                  )),
-                                  Image.asset(
-                                    "assets/logo.png",
-                                    width:
-                                        MediaQuery.of(context).size.height / 8,
-                                    height:
-                                        MediaQuery.of(context).size.height / 8,
-                                  )
-                                ],
-                              )
-                        : const Column(
-                            children: [
-                              Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            ],
-                          );
-                  })
-            ],
-          ),
-        ),
-      )),
-    );
+                                  ),
+                                );
+                              }),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height / 6,
+                          )
+                        ],
+                      )
+                          : const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                                strokeWidth: 1, color: Colors.green),
+                          ],
+                        ),
+                      );
+                    },
+                  )
+                ],
+              ),
+            )));
   }
 
   Color setStatusColor(String result) {
@@ -513,88 +500,16 @@ class _BookingsState extends State<Bookings> {
     }
   }
 
-  createFilterIsLessThan(int val) {
-    DateTime now = DateTime.now();
-    switch (val) {
-      case 0:
-        {
-          return DateTime(
-                  DateTime.now().year, DateTime.now().month, DateTime.now().day)
-              .add(const Duration(days: 1));
-        }
-      case 1:
-        {
-          return DateTime(
-                  DateTime.now().year, DateTime.now().month, DateTime.now().day)
-              .subtract(const Duration(days: 1));
-        }
-      case 2:
-        {
-          return DateTime(
-                  DateTime.now().year, DateTime.now().month, DateTime.now().day)
-              .add(const Duration(days: 2));
-        }
-      case 3:
-        {
-          return DateTime(now.year, now.month, now.day)
-              .subtract(const Duration(days: 1));
-        }
-      case 4:
-        {
-          return DateTime(now.year, now.month, now.day)
-              .add(const Duration(days: 30));
-        }
-    }
-  }
-
-  createFilterIsGreaterThan(int val) {
-    DateTime now = DateTime.now();
-    switch (val) {
-      case 0:
-        {
-          return DateTime(
-              DateTime.now().year, DateTime.now().month, DateTime.now().day);
-        }
-      case 1:
-        {
-          return DateTime(
-                  DateTime.now().year, DateTime.now().month, DateTime.now().day)
-              .subtract(const Duration(days: 1));
-        }
-      case 2:
-        {
-          return DateTime(
-                  DateTime.now().year, DateTime.now().month, DateTime.now().day)
-              .add(const Duration(days: 1));
-        }
-      case 3:
-        {
-          return DateTime(now.year, now.month, now.day)
-              .subtract(const Duration(days: 30));
-        }
-      case 4:
-        {
-          return DateTime(now.year, now.month, now.day)
-              .add(const Duration(days: 1));
-        }
-    }
-  }
-
-  createFilterForBookingType(int val) {
-    switch (val) {
-      case 0:
-        {
-          return [true, false];
-        }
-      case 1:
-        {
-          return [true];
-        }
-      case 2:
-        {
-          return [false];
-        }
-    }
+  streamOfBookings() async {
+    await _server
+        .collection("GroundBookings")
+        .where('bookingCreated',
+        isLessThanOrEqualTo: createFilterIsLessThanEqualTo(tag))
+        .where('bookingCreated',
+        isGreaterThanOrEqualTo: createFilterIsGreaterThanEqualTo(tag))
+        .where('groundType', isEqualTo: createFilterForSportsType(tag3))
+        .get()
+        .then((value) => {collection(value)});
   }
 
   createFilterForSportsType(int val) {
@@ -629,12 +544,125 @@ class _BookingsState extends State<Bookings> {
         }
     }
   }
+
+  collection(QuerySnapshot<Map<String, dynamic>> value) {
+    bookingDataListener.value = false;
+    bookingData.clear();
+    filterDuplicate.clear();
+    allSlotsRef.clear();
+    for (int i = 0; i < value.docChanges.length; i++) {
+      DateTime dt =
+      (value.docChanges[i].doc.get('bookedAt') as Timestamp).toDate();
+      DateTime dt2 =
+      (value.docChanges[i].doc.get('bookingCreated') as Timestamp).toDate();
+      if (value.docChanges[i].doc.get('entireDayBooking')) {
+        if (!filterDuplicate.contains(value.docChanges[i].doc.get('groupID'))) {
+          filterDuplicate.add(value.docChanges[i].doc.get('groupID'));
+          bookingData.add(BookingsData(
+              isBookingCancelled:
+              value.docChanges[i].doc.get('isBookingCancelled'),
+              entireDayBooking: value.docChanges[i].doc.get('entireDayBooking'),
+              bookingID: value.docChanges[i].doc.get('bookingID'),
+              slotTime: value.docChanges[i].doc.get('slotTime'),
+              bookingPerson: value.docChanges[i].doc.get('bookingPerson'),
+              bookedDate: dt,
+              feesDue: value.docChanges[i].doc.get('feesDue'),
+              allSlotsRef: value.docChanges[i].doc.get('includeSlots'),
+              slotStatus: value.docChanges[i].doc.get('slotStatus'),
+              groundName: value.docChanges[i].doc.get('groundName'),
+              bookingCreated: dt2,
+              groundType: value.docChanges[i].doc.get('groundType')));
+        }
+      } else {
+        bookingData.add(BookingsData(
+            isBookingCancelled:
+            value.docChanges[i].doc.get('isBookingCancelled'),
+            entireDayBooking: value.docChanges[i].doc.get('entireDayBooking'),
+            bookingID: value.docChanges[i].doc.get('bookingID'),
+            slotTime: value.docChanges[i].doc.get('slotTime'),
+            bookingPerson: value.docChanges[i].doc.get('bookingPerson'),
+            bookedDate: dt,
+            feesDue: value.docChanges[i].doc.get('feesDue'),
+            allSlotsRef: [],
+            slotStatus: value.docChanges[i].doc.get('slotStatus'),
+            groundName: value.docChanges[i].doc.get('groundName'),
+            bookingCreated: dt2,
+            groundType: value.docChanges[i].doc.get('groundType')));
+      }
+    }
+    bookingDataListener.value = true;
+  }
+
+  createFilterIsLessThanEqualTo(int val) {
+    switch (val) {
+    //today
+      case 0:
+        {
+          return DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day + 1);
+        }
+    //yesterday
+      case 1:
+        {
+          return DateTime(
+              DateTime.now().year, DateTime.now().month, DateTime.now().day);
+        }
+
+    //tomorrow
+      case 2:
+        {
+          return DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day + 2);
+        }
+      case 3:
+        {
+          return DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day);
+        }
+      case 4:
+        {
+          return DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day + 31);
+        }
+    }
+  }
+
+  createFilterIsGreaterThanEqualTo(int val) {
+    switch (val) {
+      case 0:
+        {
+          return DateTime(
+              DateTime.now().year, DateTime.now().month, DateTime.now().day);
+        }
+      case 1:
+        {
+          return DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day - 1);
+        }
+      case 2:
+        {
+          return DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day + 1);
+        }
+      case 3:
+        {
+          return DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day - 31);
+        }
+      case 4:
+        {
+          return DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day+1);
+        }
+    }
+  }
 }
 
 class ContentNew extends StatefulWidget {
-  const ContentNew({super.key, required this.child});
+  const ContentNew({super.key, required this.child, required this.title});
 
   final Widget child;
+  final String title;
 
   @override
   State<ContentNew> createState() => _ContentNewState();
@@ -645,13 +673,55 @@ class _ContentNewState extends State<ContentNew> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(fit: FlexFit.loose, child: widget.child),
-        ],
+      child: Card(
+        elevation: 2,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                  child: Text(widget.title,
+                      style: const TextStyle(
+                          fontFamily: "DMSans", color: Colors.black54)),
+                ),
+              ],
+            ),
+            Flexible(fit: FlexFit.loose, child: widget.child),
+          ],
+        ),
       ),
     );
   }
+}
+
+class BookingsData {
+  final bool isBookingCancelled;
+  final bool entireDayBooking;
+  final String bookingID;
+  final String groundName;
+  final String groundType;
+  final String slotTime;
+  final String bookingPerson;
+  final String slotStatus;
+  final DateTime bookedDate;
+  final DateTime bookingCreated;
+  final num feesDue;
+  final List<dynamic> allSlotsRef;
+
+  BookingsData(
+      {required this.isBookingCancelled,
+        required this.entireDayBooking,
+        required this.bookingID,
+        required this.slotTime,
+        required this.groundName,
+        required this.groundType,
+        required this.slotStatus,
+        required this.bookingPerson,
+        required this.bookedDate,
+        required this.bookingCreated,
+        required this.feesDue,
+        required this.allSlotsRef});
 }

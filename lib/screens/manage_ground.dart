@@ -127,17 +127,18 @@ class _ManageGroundState extends State<ManageGround> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(backgroundColor: Colors.white,elevation: 0,foregroundColor: Colors.black),
       body: SlidingUpPanel(
         borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(30), topRight: Radius.circular(30)),
         minHeight: MediaQuery
             .of(context)
             .size
-            .height / 1.5,
+            .height / 1.7,
         maxHeight: MediaQuery
             .of(context)
             .size
-            .height / 1.5,
+            .height / 1.7,
         panelBuilder: (sc) => _panel(sc),
         body: SafeArea(
           child: Card(
