@@ -29,7 +29,7 @@ class _SearchByAlgoliaState extends State<SearchByAlgolia> {
   var tag = 0;
 
   List<String> options = ["Sportistan Partners", "Users"];
-  List<String> type = ["SportistanPartners", "Sportistan"];
+  List<String> type = ["SportistanPartners", "SportistanUsers"];
 
   @override
   void dispose() {
@@ -82,7 +82,10 @@ class _SearchByAlgoliaState extends State<SearchByAlgolia> {
                 children: [
                   Text('Search Console',
                       style: TextStyle(fontSize: 22, color: Colors.black54)),
-                  Icon(Icons.search,color: Colors.green,)
+                  Icon(
+                    Icons.search,
+                    color: Colors.green,
+                  )
                 ],
               ),
             ),
@@ -181,27 +184,404 @@ class _SearchByAlgoliaState extends State<SearchByAlgolia> {
                                   itemCount: snapshot.data!.docs.length,
                                   itemBuilder: (context, index) {
                                     final doc = snapshot.data!.docs;
-                                    List<dynamic> allbadgesList =
-                                        doc[index].get("badges");
+                                    List<dynamic> allbadgesList;
+                                    if (tag == 0) {
+                                      allbadgesList = doc[index].get("badges");
+                                    } else {
+                                      allbadgesList = [];
+                                    }
                                     int range = index + 1;
-
-                                    return Column(
-                                      children: [
-                                        Card(
-                                          child: Column(
+                                    return tag == 0
+                                        ? Column(
                                             children: [
+                                              Card(
+                                                child: Column(
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: CircleAvatar(
+                                                          backgroundColor:
+                                                              Colors.grey,
+                                                          child: Text(
+                                                            range.toString(),
+                                                            style:
+                                                                const TextStyle(
+                                                                    color: Colors
+                                                                        .white),
+                                                          )),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              right: 8.0),
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
+                                                        children: [
+                                                          const Text(
+                                                              'Account Status : ',
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      "DMSans",
+                                                                  color: Colors
+                                                                      .black38)),
+                                                          doc[index].get(
+                                                                  'isAccountOnHold')
+                                                              ? const Icon(
+                                                                  Icons
+                                                                      .fiber_manual_record,
+                                                                  color: Colors
+                                                                      .red,
+                                                                )
+                                                              : const Icon(
+                                                                  Icons
+                                                                      .fiber_manual_record,
+                                                                  color: Colors
+                                                                      .green,
+                                                                ),
+                                                          doc[index].get(
+                                                                  'isAccountOnHold')
+                                                              ? const Text(
+                                                                  "InActive",
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .red),
+                                                                )
+                                                              : const Text(
+                                                                  "Active",
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .green),
+                                                                ),
+                                                          doc[index].get(
+                                                                  'isAccountOnHold')
+                                                              ? TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    _server
+                                                                        .collection(type[
+                                                                            tag])
+                                                                        .doc(doc[index]
+                                                                            .id)
+                                                                        .update({
+                                                                      'isAccountOnHold':
+                                                                          false
+                                                                    });
+                                                                  },
+                                                                  child: const Text(
+                                                                      ("Enable")))
+                                                              : TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    _server
+                                                                        .collection(type[
+                                                                            tag])
+                                                                        .doc(doc[index]
+                                                                            .id)
+                                                                        .update({
+                                                                      'isAccountOnHold':
+                                                                          true
+                                                                    });
+                                                                  },
+                                                                  child: const Text(
+                                                                      ("Disable")))
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8.0),
+                                                          child: Text(
+                                                              doc[index].get(
+                                                                  "groundName"),
+                                                              style: const TextStyle(
+                                                                  fontFamily:
+                                                                      "DMSans",
+                                                                  fontSize: 22,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold)),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: Text(doc[index]
+                                                          .get("locationName")),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceEvenly,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            const Text(
+                                                                "Credits : ",
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        "DMSans")),
+                                                            Text(
+                                                              doc[index]
+                                                                  .get(
+                                                                      'sportistanCredit')
+                                                                  .toString(),
+                                                              style: const TextStyle(
+                                                                  fontSize: 22,
+                                                                  fontFamily:
+                                                                      "DMSans"),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        MaterialButton(
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          50)),
+                                                          color: Colors.indigo,
+                                                          onPressed: () {
+                                                            updateCredits(
+                                                              credits: doc[
+                                                                      index]
+                                                                  .get(
+                                                                      'sportistanCredit'),
+                                                              ref:
+                                                                  doc[index].id,
+                                                            );
+                                                          },
+                                                          child: const Text(
+                                                              "Update Credits",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white)),
+                                                        )
+                                                      ],
+                                                    ),
+                                                    doc[index].get(
+                                                            'isBadgeAllotted')
+                                                        ? Column(
+                                                            children: [
+                                                              Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .end,
+                                                                  children: [
+                                                                    TextButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          editBadges(
+                                                                              badges: doc[index].get('badges'),
+                                                                              ref: doc[index].id);
+                                                                        },
+                                                                        child: const Text(
+                                                                            "Edit Badges"))
+                                                                  ]),
+                                                              ListView.builder(
+                                                                shrinkWrap:
+                                                                    true,
+                                                                physics:
+                                                                    const BouncingScrollPhysics(),
+                                                                itemCount:
+                                                                    allbadgesList
+                                                                        .length,
+                                                                itemBuilder:
+                                                                    (context,
+                                                                        badgeIndex) {
+                                                                  return Padding(
+                                                                    padding:
+                                                                        const EdgeInsets
+                                                                            .all(
+                                                                            8.0),
+                                                                    child: Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: [
+                                                                        Text(
+                                                                            allbadgesList[
+                                                                                badgeIndex],
+                                                                            style:
+                                                                                const TextStyle(fontSize: 20, fontFamily: "DMSans")),
+                                                                        const Icon(
+                                                                          Icons
+                                                                              .verified_outlined,
+                                                                          color:
+                                                                              Colors.indigo,
+                                                                        )
+                                                                      ],
+                                                                    ),
+                                                                  );
+                                                                },
+                                                              ),
+                                                            ],
+                                                          )
+                                                        : CupertinoButton(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .zero,
+                                                            color: Colors.teal,
+                                                            onPressed: () {
+                                                              editBadges(
+                                                                  badges: doc[
+                                                                          index]
+                                                                      .get(
+                                                                          'badges'),
+                                                                  ref:
+                                                                      doc[index]
+                                                                          .id);
+                                                            },
+                                                            child: const Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                Text(
+                                                                    "Add Badge",
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .white)),
+                                                                Icon(
+                                                                  Icons
+                                                                      .badge_outlined,
+                                                                  color: Colors
+                                                                      .white,
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                    Padding(
+                                                      padding: const EdgeInsets.all(8.0),
+                                                      child: CupertinoButton(
+                                                        color: Colors.green,
+                                                        onPressed: () {
+                                                          PageRouter.push(
+                                                              context,
+                                                              ManageGround(
+                                                                  groundID: doc[
+                                                                          index]
+                                                                      .get(
+                                                                          "groundID"),
+                                                                  groundType: doc[
+                                                                          index]
+                                                                      .get(
+                                                                          "groundType"),
+                                                                  groundName:
+                                                                      doc[index].get(
+                                                                          "groundName"),
+                                                                  groundAddress:
+                                                                      doc[index].get(
+                                                                          "locationName"),
+                                                                  refID:
+                                                                      doc[index]
+                                                                          .id,
+                                                                  onwards: doc[
+                                                                          index]
+                                                                      .get(
+                                                                          'onwards')));
+                                                        },
+                                                        child: const Text(
+                                                            "Create Ground Booking",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white)),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          )
+                                        : Column(children: [
+                                            Card(
+                                                child: Column(children: [
                                               Padding(
                                                 padding:
                                                     const EdgeInsets.all(8.0),
                                                 child: CircleAvatar(
                                                     backgroundColor:
-                                                        Colors.grey,
+                                                        Colors.green,
                                                     child: Text(
                                                       range.toString(),
                                                       style: const TextStyle(
                                                           color: Colors.white),
                                                     )),
                                               ),
+                                              Text(
+                                                doc[index].get('name'),
+                                                style: const TextStyle(
+                                                    fontFamily: "DMSans",
+                                                    fontSize: 18),
+                                              ),
+                                               Card(
+                                                shape:  RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                child: const Padding(
+                                                  padding: EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                    'User',
+                                                    style: TextStyle(
+                                                        fontFamily: "DMSans",
+                                                        fontSize: 18),
+                                                  ),
+                                                ),
+                                              ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceEvenly,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          const Text(
+                                                              "Credits : ",
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                  "DMSans")),
+                                                          Text(
+                                                            doc[index]
+                                                                .get(
+                                                                'sportistanCredit')
+                                                                .toString(),
+                                                            style: const TextStyle(
+                                                                fontSize: 22,
+                                                                fontFamily:
+                                                                "DMSans"),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      MaterialButton(
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                            BorderRadius
+                                                                .circular(
+                                                                50)),
+                                                        color: Colors.indigo,
+                                                        onPressed: () {
+                                                          updateCredits(
+                                                            credits: doc[
+                                                            index]
+                                                                .get(
+                                                                'sportistanCredit'),
+                                                            ref:
+                                                            doc[index].id,
+                                                          );
+                                                        },
+                                                        child: const Text(
+                                                            "Update Credits",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white)),
+                                                      )
+                                                    ],
+                                                  ),
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                     right: 8.0),
@@ -277,214 +657,8 @@ class _SearchByAlgoliaState extends State<SearchByAlgolia> {
                                                   ],
                                                 ),
                                               ),
-                                              Row(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Text(
-                                                        doc[index]
-                                                            .get("groundName"),
-                                                        style: const TextStyle(
-                                                            fontFamily:
-                                                                "DMSans",
-                                                            fontSize: 22,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold)),
-                                                  ),
-                                                ],
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: Text(doc[index]
-                                                    .get("locationName")),
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      const Text("Credits : ",
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  "DMSans")),
-                                                      Text(
-                                                        doc[index]
-                                                            .get(
-                                                                'sportistanCredit')
-                                                            .toString(),
-                                                        style: const TextStyle(
-                                                            fontSize: 22,
-                                                            fontFamily:
-                                                                "DMSans"),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  MaterialButton(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        50)),
-                                                    color: Colors.indigo,
-                                                    onPressed: () {
-                                                      updateCredits(
-                                                        credits: doc[index].get(
-                                                            'sportistanCredit'),
-                                                        ref: doc[index].id,
-                                                      );
-                                                    },
-                                                    child: const Text(
-                                                        "Update Credits",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white)),
-                                                  )
-                                                ],
-                                              ),
-                                              doc[index].get('isBadgeAllotted')
-                                                  ? Column(
-                                                      children: [
-                                                        Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .end,
-                                                            children: [
-                                                              TextButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    editBadges(
-                                                                        badges: doc[index].get(
-                                                                            'badges'),
-                                                                        ref: doc[index]
-                                                                            .id);
-                                                                  },
-                                                                  child: const Text(
-                                                                      "Edit Badges"))
-                                                            ]),
-                                                        ListView.builder(
-                                                          shrinkWrap: true,
-                                                          physics:
-                                                              const BouncingScrollPhysics(),
-                                                          itemCount:
-                                                              allbadgesList
-                                                                  .length,
-                                                          itemBuilder: (context,
-                                                              badgeIndex) {
-                                                            return Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(8.0),
-                                                              child: Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .spaceBetween,
-                                                                children: [
-                                                                  Text(
-                                                                      allbadgesList[
-                                                                          badgeIndex],
-                                                                      style: const TextStyle(
-                                                                          fontSize:
-                                                                              20,
-                                                                          fontFamily:
-                                                                              "DMSans")),
-                                                                  const Icon(
-                                                                    Icons
-                                                                        .verified_outlined,
-                                                                    color: Colors
-                                                                        .indigo,
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            );
-                                                          },
-                                                        ),
-                                                      ],
-                                                    )
-                                                  : CupertinoButton(
-                                                      borderRadius:
-                                                          BorderRadius.zero,
-                                                      color: Colors.teal,
-                                                      onPressed: () {
-                                                        editBadges(
-                                                            badges: doc[index]
-                                                                .get('badges'),
-                                                            ref: doc[index].id);
-                                                      },
-                                                      child: const Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          Text("Add Badge",
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white)),
-                                                          Icon(
-                                                            Icons
-                                                                .badge_outlined,
-                                                            color: Colors.white,
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                children: [
-                                                  MaterialButton(
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        50)),
-                                                    color: Colors.green,
-                                                    onPressed: () {
-                                                      PageRouter.push(
-                                                          context,
-                                                          ManageGround(
-                                                              groundID: doc[
-                                                                      index]
-                                                                  .get(
-                                                                      "groundID"),
-                                                              groundType: doc[
-                                                                      index]
-                                                                  .get(
-                                                                      "groundType"),
-                                                              groundName: doc[
-                                                                      index]
-                                                                  .get(
-                                                                      "groundName"),
-                                                              groundAddress:
-                                                                  doc[index].get(
-                                                                      "locationName"),
-                                                              refID:
-                                                                  doc[index].id,
-                                                              onwards: doc[
-                                                                      index]
-                                                                  .get(
-                                                                      'onwards')));
-                                                    },
-                                                    child: const Text(
-                                                        "Open Ground Details",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white)),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    );
+                                            ])),
+                                          ]);
                                   },
                                 )
                               : const Center(

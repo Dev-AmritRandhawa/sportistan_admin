@@ -1,11 +1,14 @@
 import 'package:chips_choice/chips_choice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delayed_display/delayed_display.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:sportistan_admin/home/nav/booking_entireday_info.dart';
-import 'package:sportistan_admin/home/nav/booking_info.dart';
 import 'package:sportistan_admin/widgets/page_router.dart';
+
+import 'booking_entireday_info.dart';
+import 'booking_info.dart';
+
 
 class Bookings extends StatefulWidget {
   const Bookings({super.key});
@@ -19,6 +22,7 @@ class _BookingsState extends State<Bookings> {
   DateTime dateTime = DateTime.now();
   ValueNotifier<bool> showFilter = ValueNotifier<bool>(false);
   var options = [
+    "All",
     "Today",
     "Yesterday",
     "Tomorrow",
@@ -449,12 +453,12 @@ class _BookingsState extends State<Bookings> {
                           )
                         ],
                       )
-                          : const Center(
+                          :  Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            CircularProgressIndicator(
-                                strokeWidth: 1, color: Colors.green),
+                            const Text('No Bookings Found',style: TextStyle(fontSize: 22,fontFamily: "DMSans",color: Colors.orange)),
+                            Text(options[tag].toString(),style: const TextStyle(fontSize: 22,fontFamily: "DMSans",color: Colors.black54)),
                           ],
                         ),
                       );
@@ -599,27 +603,31 @@ class _BookingsState extends State<Bookings> {
       case 0:
         {
           return DateTime(DateTime.now().year, DateTime.now().month,
-              DateTime.now().day + 1);
-        }
-    //yesterday
-      case 1:
-        {
-          return DateTime(
-              DateTime.now().year, DateTime.now().month, DateTime.now().day);
-        }
-
-    //tomorrow
-      case 2:
-        {
-          return DateTime(DateTime.now().year, DateTime.now().month,
-              DateTime.now().day + 2);
-        }
-      case 3:
+              DateTime.now().day+365);
+        } case 1:
         {
           return DateTime(DateTime.now().year, DateTime.now().month,
               DateTime.now().day);
         }
+    //yesterday
+      case 2:
+        {
+          return DateTime(
+              DateTime.now().year, DateTime.now().month, DateTime.now().day-1);
+        }
+
+    //tomorrow
+      case 3:
+        {
+          return DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day + 1);
+        }
       case 4:
+        {
+          return DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day-1);
+        }
+      case 5:
         {
           return DateTime(DateTime.now().year, DateTime.now().month,
               DateTime.now().day + 31);
@@ -633,23 +641,27 @@ class _BookingsState extends State<Bookings> {
         {
           return DateTime(
               DateTime.now().year, DateTime.now().month, DateTime.now().day);
-        }
-      case 1:
+        }  case 1:
         {
-          return DateTime(DateTime.now().year, DateTime.now().month,
-              DateTime.now().day - 1);
+          return DateTime(
+              DateTime.now().year, DateTime.now().month, DateTime.now().day);
         }
       case 2:
         {
           return DateTime(DateTime.now().year, DateTime.now().month,
-              DateTime.now().day + 1);
+              DateTime.now().day - 1);
         }
       case 3:
         {
           return DateTime(DateTime.now().year, DateTime.now().month,
-              DateTime.now().day - 31);
+              DateTime.now().day + 1);
         }
       case 4:
+        {
+          return DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day - 31);
+        }
+      case 5:
         {
           return DateTime(DateTime.now().year, DateTime.now().month,
               DateTime.now().day+1);

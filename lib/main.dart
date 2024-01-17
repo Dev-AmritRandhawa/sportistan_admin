@@ -11,7 +11,6 @@ import 'package:sportistan_admin/authentication/login.dart';
 import 'package:sportistan_admin/firebase_options.dart';
 import 'package:sportistan_admin/home/home.dart';
 
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -64,15 +63,11 @@ class _MyHomePageState extends State<MyHomePage>
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback(
-            (_) => Future.delayed(const Duration(milliseconds: 2000), () async {
-        }).then((value) => {
-        if(mounted){
-          check()
-
-        }
-
-            }));
+    WidgetsBinding.instance.addPostFrameCallback((_) =>
+        Future.delayed(const Duration(milliseconds: 2000), () async {})
+            .then((value) => {
+                  if (mounted) {check()}
+                }));
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -91,8 +86,7 @@ class _MyHomePageState extends State<MyHomePage>
             ),
             Image.asset("assets/logo.png",
                 height: MediaQuery.of(context).size.height / 8),
-            const Text("Admin Console",
-                style: TextStyle(fontFamily: "DMSans")),
+            const Text("Admin Console", style: TextStyle(fontFamily: "DMSans")),
             const CircularProgressIndicator(
               color: Colors.green,
               strokeWidth: 1,
@@ -104,23 +98,36 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   Future<void> check() async {
-      if (_auth.currentUser != null) {
-        if(Platform.isAndroid){
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Home(),));
-        }
-        if(Platform.isIOS){
-          Navigator.pushReplacement(context, CupertinoPageRoute(builder: (context) => const Home(),));
-        }
-
-      } else {
-        if(Platform.isAndroid){
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login(),));
-        }
-        if(Platform.isIOS){
-          Navigator.pushReplacement(context, CupertinoPageRoute(builder: (context) => const Login(),));
-        }
-
+    if (_auth.currentUser != null) {
+      if (Platform.isAndroid) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Home(),
+            ));
       }
-
+      if (Platform.isIOS) {
+        Navigator.pushReplacement(
+            context,
+            CupertinoPageRoute(
+              builder: (context) => const Home(),
+            ));
+      }
+    } else {
+      if (Platform.isAndroid) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const Login(),
+            ));
+      }
+      if (Platform.isIOS) {
+        Navigator.pushReplacement(
+            context,
+            CupertinoPageRoute(
+              builder: (context) => const Login(),
+            ));
+      }
+    }
   }
 }

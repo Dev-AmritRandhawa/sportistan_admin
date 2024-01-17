@@ -3,9 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-
+import 'package:sportistan_admin/screens/unique.dart';
 import '../widgets/errors.dart';
-import 'book_a_slot.dart';
 
 
 class NavSlotSettings extends StatefulWidget {
@@ -384,7 +383,7 @@ class _NavSlotSettingsState extends State<NavSlotSettings> {
             'time': DataSave.entries[i].name,
             'timeEnd': DataSave.entries[i].name2,
             'price': int.parse(DataSave.entries[i].email),
-            'slotID': UniqueID.generateRandomString(),
+            'slotID': UniqueID,
           }
       ]
     }).then((value) async => {

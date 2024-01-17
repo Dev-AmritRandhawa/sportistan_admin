@@ -59,6 +59,9 @@ dependencies:
   clipboard: ^0.1.3
   liquid_pull_to_refresh: any
   collection: any
+  animated_text_kit: any
+  firebase_messaging: any
+  recaptcha_enterprise_flutter: ^18.4.0
 
 
 dev_dependencies:

@@ -74,15 +74,15 @@ android {
             // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
             minSdkVersion 24
             targetSdkVersion flutter.targetSdkVersion
-            versionCode=2
-            versionName=2
+            versionCode=5
+            versionName=5
         }
 
         signingConfigs {
             release {
-                storeFile file("C:/Users/amrit/AndroidStudioProjects/sportistan_admin/android/app/upload-keystore.jks")
+                storeFile file("C:/Users/amrit/StudioProjects/sportistan_admin/android/app/upload.jks")
                 storePassword "123456"
-                keyAlias "upload"
+                keyAlias "androiddebugkey"
                 keyPassword "123456"
             }
         }
@@ -99,5 +99,6 @@ android {
     }
 
     dependencies {
+        implementation 'com.google.android.recaptcha:recaptcha:18.4.0'
     }
-}
+    }
