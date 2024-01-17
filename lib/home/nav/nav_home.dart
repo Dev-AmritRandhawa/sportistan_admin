@@ -1,7 +1,6 @@
 import 'package:chips_choice/chips_choice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delayed_display/delayed_display.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sportistan_admin/widgets/page_router.dart';
@@ -425,7 +424,7 @@ class _BookingsState extends State<Bookings> {
                                                   .allSlotsRef
                                                   .length,
                                               itemBuilder:
-                                                  (context, count) {
+                                                  (context, countNumber) {
                                                 return Padding(
                                                   padding:
                                                   const EdgeInsets
@@ -435,7 +434,7 @@ class _BookingsState extends State<Bookings> {
                                                       child: Text(bookingData[
                                                       index]
                                                           .allSlotsRef[
-                                                      count]
+                                                      countNumber]
                                                           .toString())),
                                                 );
                                               },

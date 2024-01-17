@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:sportistan_admin/home/nav/nav_home.dart';
 import 'package:sportistan_admin/screens/account_kyc.dart';
@@ -31,41 +33,46 @@ class _HomeState extends State<Home> {
         home: Scaffold(
             bottomSheet: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: GNav(
-                mainAxisAlignment: MainAxisAlignment.center,
-                rippleColor: Colors.grey[300]!,
-                hoverColor: Colors.grey[100]!,
-                activeColor: Colors.green,
-                iconSize: 24,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                duration: const Duration(milliseconds: 400),
-                tabBackgroundColor: Colors.grey[100]!,
-                color: Colors.black54,
-                tabs: const [
-                  GButton(
-                    icon: Icons.home,
-                    text: 'All Bookings',
-                  ),
-                  GButton(
-                    icon: Icons.verified,
-                    text: 'Pending KYC',
-                  ),
-                  GButton(
-                    icon: Icons.search,
-                    text: 'Search User',
-                  ),
-                  GButton(
-                    icon: Icons.account_balance_wallet,
-                    text: 'Earning',
-                  ),
-                ],
-                selectedIndex: _selectedIndex,
-                onTabChange: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                },
+              child: Container(
+                margin: Platform.isIOS
+                    ? const EdgeInsets.only(bottom: 50)
+                    : const EdgeInsets.all(0),
+                child: GNav(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  rippleColor: Colors.grey[300]!,
+                  hoverColor: Colors.grey[100]!,
+                  activeColor: Colors.green,
+                  iconSize: 24,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  duration: const Duration(milliseconds: 400),
+                  tabBackgroundColor: Colors.grey[100]!,
+                  color: Colors.black54,
+                  tabs: const [
+                    GButton(
+                      icon: Icons.home,
+                      text: 'All Bookings',
+                    ),
+                    GButton(
+                      icon: Icons.verified,
+                      text: 'Pending KYC',
+                    ),
+                    GButton(
+                      icon: Icons.search,
+                      text: 'Search User',
+                    ),
+                    GButton(
+                      icon: Icons.account_balance_wallet,
+                      text: 'Earning',
+                    ),
+                  ],
+                  selectedIndex: _selectedIndex,
+                  onTabChange: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                ),
               ),
             ),
             body: _widgetOptions.elementAt(_selectedIndex)));
