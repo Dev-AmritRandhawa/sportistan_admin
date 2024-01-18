@@ -64,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage>
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) =>
-        Future.delayed(const Duration(milliseconds: 2000), () async {})
+        Future.delayed(const Duration(milliseconds: 2500), () async {})
             .then((value) => {
                   if (mounted) {check()}
                 }));
@@ -87,9 +87,12 @@ class _MyHomePageState extends State<MyHomePage>
             Image.asset("assets/logo.png",
                 height: MediaQuery.of(context).size.height / 8),
             const Text("Admin Console", style: TextStyle(fontFamily: "DMSans")),
-            const CircularProgressIndicator(
-              color: Colors.green,
-              strokeWidth: 1,
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: CircularProgressIndicator(
+                color: Colors.green,
+                strokeWidth: 1,
+              ),
             )
           ],
         ),
