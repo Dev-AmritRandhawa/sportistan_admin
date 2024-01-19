@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:chips_choice/chips_choice.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:delayed_display/delayed_display.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:sportistan_admin/main.dart';
 import 'package:sportistan_admin/widgets/page_router.dart';
-
 import 'booking_entireday_info.dart';
 import 'booking_info.dart';
 
@@ -59,6 +63,21 @@ class _BookingsState extends State<Bookings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          actions: [TextButton(onPressed: (){
+            try{
+              FirebaseAuth.instance.signOut().then((value) => {
+                PageRouter.pushRemoveUntil(context, const MyApp())
+              });
+            }catch(e){
+              return;
+            }
+
+          }
+          , child: const Text("Logout"))]),
         body: SafeArea(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
@@ -489,17 +508,38 @@ class _BookingsState extends State<Bookings> {
   void checkBookingType(
       {required bool entireDayBooked, required String bookingID}) {
     if (entireDayBooked) {
-      PageRouter.push(
-          context,
-          BookingEntireDayInfo(
-            bookingID: bookingID,
-          ));
+
+      if(Platform.isAndroid){
+        Navigator.push(context, MaterialPageRoute(builder: (context) => BookingEntireDayInfo(
+          bookingID: bookingID,
+        ),)).then((value) => {
+          streamOfBookings()
+        });
+      }
+      if(Platform.isIOS){
+        Navigator.push(context, CupertinoPageRoute(builder: (context) => BookingEntireDayInfo(
+          bookingID: bookingID,
+        ),)).then((value) => {
+          streamOfBookings()
+        });
+      }
+
     } else {
-      PageRouter.push(
-          context,
-          BookingInfo(
-            bookingID: bookingID,
-          ));
+      if(Platform.isAndroid){
+        Navigator.push(context, MaterialPageRoute(builder: (context) => BookingInfo(
+          bookingID: bookingID,
+        ),)).then((value) => {
+          streamOfBookings()
+        });
+      }
+      if(Platform.isIOS){
+        Navigator.push(context, CupertinoPageRoute(builder: (context) => BookingInfo(
+          bookingID: bookingID,
+        ),)).then((value) => {
+          streamOfBookings()
+        });
+      }
+
     }
   }
 
