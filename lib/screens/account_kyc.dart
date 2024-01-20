@@ -205,7 +205,7 @@ class _AccountKYCState extends State<AccountKYC> {
                                                                                   }).then((value) async => {
                                                                                         Navigator.pop(newCtx),
                                                                                         Navigator.pop(ctx),
-                                                                                        await _server.collection("DeviceTokens").where('userID', isEqualTo: snapshot.data!.docChanges[index].doc.get("userID")).get().then((v) => {
+                                                                                        await _server.collection("SportistanPartners").where('groundID', isEqualTo: snapshot.data!.docChanges[index].doc.get("groundID")).get().then((v) => {
                                                                                               FirebaseCloudMessaging.sendPushMessage("Your Ground KYC is Successfully Verified Start Booking Now", "Congratulations", v.docChanges.first.doc.get("token"))
                                                                                             })
                                                                                       });
@@ -358,7 +358,7 @@ class _AccountKYCState extends State<AccountKYC> {
                                                                                 }).then((value) async => {
                                                                                       Navigator.pop(newCtx),
                                                                                       await deleteAllPhotosInFolder(snapshot, '/groundImages'),
-                                                                                      await _server.collection("DeviceTokens").where('userID', isEqualTo: snapshot.data!.docChanges[index].doc.get("userID")).get().then((v) => {
+                                                                                      await _server.collection("SportistanPartners").where('groundID', isEqualTo: snapshot.data!.docChanges[index].doc.get("groundID")).get().then((v) => {
                                                                                             Navigator.pop(ctx),
                                                                                             FirebaseCloudMessaging.sendPushMessage("Your Ground KYC is Rejected Reason are Mentioned in Profile > My Grounds", "We're Sorry", v.docChanges.first.doc.get("token"))
                                                                                           })

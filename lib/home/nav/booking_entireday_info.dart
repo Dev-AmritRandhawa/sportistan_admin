@@ -12,7 +12,6 @@ import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:sportistan_admin/home/home.dart';
-import 'package:sportistan_admin/home/nav/nav_home.dart';
 import 'package:sportistan_admin/widgets/errors.dart';
 import 'package:sportistan_admin/widgets/page_router.dart';
 import 'package:sportistan_admin/widgets/send_cloud_message.dart';
