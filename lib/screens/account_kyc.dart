@@ -115,270 +115,274 @@ class _AccountKYCState extends State<AccountKYC> {
                                           showModalBottomSheet(
                                             context: context,
                                             builder: (ctx) {
-                                              return Wrap(
-                                                alignment: WrapAlignment.center,
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: CupertinoButton(
-                                                        color: Colors.green,
-                                                        onPressed: () {
-                                                          showModalBottomSheet(
-                                                            context: context,
-                                                            builder: (newCtx) {
-                                                              return StatefulBuilder(
-                                                                builder: (context,
-                                                                    setState) {
-                                                                  return Column(
-                                                                    children: [
-                                                                      const Text(
-                                                                        "Set Commission",
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontSize:
-                                                                              22,
-                                                                        ),
-                                                                      ),
-                                                                      Form(
-                                                                        key:
-                                                                            commissionKey,
-                                                                        child:
-                                                                            Padding(
-                                                                          padding: EdgeInsets.only(
-                                                                              left: MediaQuery.of(context).size.width / 15,
-                                                                              right: MediaQuery.of(context).size.width / 15),
-                                                                          child:
-                                                                              TextFormField(
-                                                                            controller:
-                                                                                commissionController,
-                                                                            keyboardType:
-                                                                                TextInputType.number,
-                                                                            inputFormatters: [
-                                                                              FilteringTextInputFormatter.digitsOnly
-                                                                            ],
-                                                                            validator:
-                                                                                (v) {
-                                                                              if (v!.isEmpty) {
-                                                                                return 'Enter Commission';
-                                                                              } else if (int.parse(v) > 99 || int.parse(v) == 0) {
-                                                                                return "Not Valid";
-                                                                              } else {
-                                                                                return null;
-                                                                              }
-                                                                            },
-                                                                            maxLength:
-                                                                                2,
-                                                                            decoration: InputDecoration(
-                                                                                errorStyle: const TextStyle(color: Colors.red),
-                                                                                filled: true,
-                                                                                hintText: "Commission",
-                                                                                suffixIcon: InkWell(
-                                                                                    onTap: () {
-                                                                                      commissionController.clear();
-                                                                                    },
-                                                                                    child: const Icon(Icons.close)),
-                                                                                prefixIcon: const Icon(Icons.percent, color: Colors.black54, size: 20),
-                                                                                fillColor: Colors.grey.shade100,
-                                                                                border: OutlineInputBorder(
-                                                                                  borderRadius: BorderRadius.circular(10),
-                                                                                  borderSide: BorderSide.none,
-                                                                                )),
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                      ValueListenableBuilder(
-                                                                        valueListenable:
-                                                                            setCommission,
-                                                                        builder: (context, value, child) => value ? const CircularProgressIndicator(strokeWidth: 1,) :CupertinoButton(
-                                                                            color: Colors.green,
-                                                                            onPressed: () {
-                                                                              setCommission.value = true;
-                                                                              if (commissionKey.currentState!.validate()) {
-                                                                                _server.collection("SportistanPartners").doc(snapshot.data!.docChanges[index].doc.id).update({
-                                                                                  'isKYCPending': false,
-                                                                                  'isVerified': true,
-                                                                                  'kycStatus': 'Approved',
-                                                                                }).then((value) async => {
-                                                                                      Navigator.pop(newCtx),
-                                                                                      Navigator.pop(ctx),
-                                                                                      await _server.collection("DeviceTokens").where('userID', isEqualTo: snapshot.data!.docChanges[index].doc.get("userID")).get().then((v) => {
-                                                                                            FirebaseCloudMessaging.sendPushMessage("Your Ground KYC is Successfully Verified Start Booking Now", "Congratulations", v.docChanges.first.doc.get("token"))
-                                                                                          })
-                                                                                    });
-                                                                              }
-                                                                            },
-                                                                            child: const Text("Set Commission")),
-                                                                      )
-                                                                    ],
-                                                                  );
-                                                                },
-                                                              );
-                                                            },
-                                                          );
-                                                        },
-                                                        child: const Text(
-                                                            "Approved",
-                                                            style: TextStyle(
-                                                                fontFamily:
-                                                                    "DMSans"))),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: CupertinoButton(
-                                                        color: Colors.red,
-                                                        onPressed: () {
-                                                          showModalBottomSheet(
-                                                            context: context,
-                                                            builder: (newCtx) {
-                                                              return StatefulBuilder(
-                                                                builder: (context,
-                                                                    setState) {
-                                                                  return SingleChildScrollView(
-                                                                    physics:
-                                                                        const BouncingScrollPhysics(),
-                                                                    child:
-                                                                        Column(
+                                              return Container(
+                                                margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height/15),
+                                                child: Wrap(
+                                                  alignment: WrapAlignment.center,
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: CupertinoButton(
+                                                          color: Colors.green,
+                                                          onPressed: () {
+                                                            showModalBottomSheet(
+                                                              context: context,
+                                                              builder: (newCtx) {
+                                                                return StatefulBuilder(
+                                                                  builder: (context,
+                                                                      setState) {
+                                                                    return Column(
                                                                       children: [
-                                                                        const Padding(
-                                                                          padding:
-                                                                              EdgeInsets.all(8.0),
-                                                                          child:
-                                                                              Text(
-                                                                            'Please Mention The Reason of Rejection',
-                                                                            style:
-                                                                                TextStyle(
-                                                                              fontSize: 22,
-                                                                              fontFamily: "Nunito",
-                                                                              color: Colors.redAccent,
-                                                                            ),
-                                                                            softWrap:
-                                                                                true,
+                                                                        const Text(
+                                                                          "Set Commission",
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                22,
                                                                           ),
                                                                         ),
-                                                                        Padding(
-                                                                          padding: const EdgeInsets
-                                                                              .all(
-                                                                              8.0),
+                                                                        Form(
+                                                                          key:
+                                                                              commissionKey,
                                                                           child:
-                                                                              ListView(
-                                                                            physics:
-                                                                                const BouncingScrollPhysics(),
-                                                                            shrinkWrap:
-                                                                                true,
-                                                                            addAutomaticKeepAlives:
-                                                                                true,
-                                                                            children: <Widget>[
-                                                                              Content(
-                                                                                title: 'Choose Reject Reasons',
-                                                                                child: ChipsChoice<String>.multiple(
-                                                                                  value: serviceTags,
-                                                                                  onChanged: (val) => setState(() => serviceTags = val),
-                                                                                  choiceItems: C2Choice.listFrom<String, String>(
-                                                                                    source: serviceOptions,
-                                                                                    value: (i, v) => v,
-                                                                                    label: (i, v) => v,
-                                                                                    tooltip: (i, v) => v,
-                                                                                  ),
-                                                                                  choiceCheckmark: true,
-                                                                                  choiceStyle: C2ChipStyle.filled(
-                                                                                    color: Colors.green,
-                                                                                    selectedStyle: const C2ChipStyle(
-                                                                                      borderRadius: BorderRadius.all(
-                                                                                        Radius.circular(25),
-                                                                                      ),
-                                                                                    ),
-                                                                                  ),
-                                                                                  wrapped: true,
-                                                                                ),
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                        Padding(
-                                                                          padding: const EdgeInsets
-                                                                              .all(
-                                                                              8.0),
-                                                                          child:
-                                                                              Form(
-                                                                            key:
-                                                                                otherServiceKey,
+                                                                              Padding(
+                                                                            padding: EdgeInsets.only(
+                                                                                left: MediaQuery.of(context).size.width / 15,
+                                                                                right: MediaQuery.of(context).size.width / 15),
                                                                             child:
-                                                                                SizedBox(
-                                                                              width: MediaQuery.of(context).size.width / 1.2,
-                                                                              child: TextFormField(
-                                                                                validator: (v) {
-                                                                                  if (v!.isEmpty) {
-                                                                                    return "Empty Field";
-                                                                                  } else {
-                                                                                    return null;
-                                                                                  }
-                                                                                },
-                                                                                controller: otherService,
-                                                                                decoration: InputDecoration(fillColor: Colors.grey.shade200, hintText: "Add any other reason", border: InputBorder.none, errorStyle: const TextStyle(color: Colors.red), filled: true, labelStyle: const TextStyle(color: Colors.black)),
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                        Padding(
-                                                                          padding: const EdgeInsets
-                                                                              .all(
-                                                                              8.0),
-                                                                          child: CupertinoButton(
-                                                                              onPressed: () {
-                                                                                if (otherServiceKey.currentState!.validate()) {
-                                                                                  if (!serviceOptions.contains(otherService.value.text)) {
-                                                                                    serviceTags.add(otherService.value.text);
-                                                                                    serviceOptions.add(otherService.value.text);
-                                                                                    setState(() {});
-                                                                                  }
+                                                                                TextFormField(
+                                                                              controller:
+                                                                                  commissionController,
+                                                                              keyboardType:
+                                                                                  TextInputType.number,
+                                                                              inputFormatters: [
+                                                                                FilteringTextInputFormatter.digitsOnly
+                                                                              ],
+                                                                              validator:
+                                                                                  (v) {
+                                                                                if (v!.isEmpty) {
+                                                                                  return 'Enter Commission';
+                                                                                } else if (int.parse(v) > 99 || int.parse(v) == 0) {
+                                                                                  return "Not Valid";
+                                                                                } else {
+                                                                                  return null;
                                                                                 }
                                                                               },
-                                                                              color: Colors.indigoAccent,
-                                                                              child: const Text(
-                                                                                "Add Reason",
-                                                                                style: TextStyle(color: Colors.white),
-                                                                              )),
+                                                                              maxLength:
+                                                                                  2,
+                                                                              decoration: InputDecoration(
+                                                                                  errorStyle: const TextStyle(color: Colors.red),
+                                                                                  filled: true,
+                                                                                  hintText: "Commission",
+                                                                                  suffixIcon: InkWell(
+                                                                                      onTap: () {
+                                                                                        commissionController.clear();
+                                                                                      },
+                                                                                      child: const Icon(Icons.close)),
+                                                                                  prefixIcon: const Icon(Icons.percent, color: Colors.black54, size: 20),
+                                                                                  fillColor: Colors.grey.shade100,
+                                                                                  border: OutlineInputBorder(
+                                                                                    borderRadius: BorderRadius.circular(10),
+                                                                                    borderSide: BorderSide.none,
+                                                                                  )),
+                                                                            ),
+                                                                          ),
                                                                         ),
-                                                                        CupertinoButton(
-                                                                            color: Colors
-                                                                                .red,
-                                                                            onPressed:
-                                                                                () {
-                                                                              _server.collection("SportistanPartners").doc(snapshot.data!.docChanges[index].doc.id).update({
-                                                                                'isKYCPending': true,
-                                                                                'isVerified': false,
-                                                                                'kycStatus': 'Rejected',
-                                                                                'rejectReason': serviceTags
-                                                                              }).then((value) async => {
-                                                                                    Navigator.pop(newCtx),
-                                                                                    await deleteAllPhotosInFolder(snapshot, '/groundImages'),
-                                                                                    await _server.collection("DeviceTokens").where('userID', isEqualTo: snapshot.data!.docChanges[index].doc.get("userID")).get().then((v) => {
-                                                                                          Navigator.pop(ctx),
-                                                                                          FirebaseCloudMessaging.sendPushMessage("Your Ground KYC is Rejected Reason are Mentioned in Profile > My Grounds", "We're Sorry", v.docChanges.first.doc.get("token"))
-                                                                                        })
-                                                                                  });
-                                                                            },
-                                                                            child:
-                                                                                const Text("Reject")),
+                                                                        ValueListenableBuilder(
+                                                                          valueListenable:
+                                                                              setCommission,
+                                                                          builder: (context, value, child) => value ? const CircularProgressIndicator(strokeWidth: 1,) :CupertinoButton(
+                                                                              color: Colors.green,
+                                                                              onPressed: () {
+                                                                                setCommission.value = true;
+                                                                                if (commissionKey.currentState!.validate()) {
+                                                                                  _server.collection("SportistanPartners").doc(snapshot.data!.docChanges[index].doc.id).update({
+                                                                                    'isKYCPending': false,
+                                                                                    'isVerified': true,
+                                                                                    'kycStatus': 'Approved',
+                                                                                  }).then((value) async => {
+                                                                                        Navigator.pop(newCtx),
+                                                                                        Navigator.pop(ctx),
+                                                                                        await _server.collection("DeviceTokens").where('userID', isEqualTo: snapshot.data!.docChanges[index].doc.get("userID")).get().then((v) => {
+                                                                                              FirebaseCloudMessaging.sendPushMessage("Your Ground KYC is Successfully Verified Start Booking Now", "Congratulations", v.docChanges.first.doc.get("token"))
+                                                                                            })
+                                                                                      });
+                                                                                }
+                                                                              },
+                                                                              child: const Text("Set Commission")),
+                                                                        )
                                                                       ],
-                                                                    ),
-                                                                  );
-                                                                },
-                                                              );
-                                                            },
-                                                          );
-                                                        },
-                                                        child: const Text(
-                                                            "Reject",
-                                                            style: TextStyle(
-                                                                fontFamily:
-                                                                    "DMSans"))),
-                                                  )
-                                                ],
+                                                                    );
+                                                                  },
+                                                                );
+                                                              },
+                                                            );
+                                                          },
+                                                          child: const Text(
+                                                              "Approved",
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      "DMSans"))),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      child: CupertinoButton(
+                                                          color: Colors.red,
+                                                          onPressed: () {
+                                                            showModalBottomSheet(
+                                                              context: context,
+                                                              builder: (newCtx) {
+                                                                return StatefulBuilder(
+                                                                  builder: (context,
+                                                                      setState) {
+                                                                    return SingleChildScrollView(
+                                                                      physics:
+                                                                          const BouncingScrollPhysics(),
+                                                                      child:
+                                                                          Column(
+                                                                        children: [
+                                                                          const Padding(
+                                                                            padding:
+                                                                                EdgeInsets.all(8.0),
+                                                                            child:
+                                                                                Text(
+                                                                              'Please Mention The Reason of Rejection',
+                                                                              style:
+                                                                                  TextStyle(
+                                                                                fontSize: 22,
+                                                                                fontFamily: "Nunito",
+                                                                                color: Colors.redAccent,
+                                                                              ),
+                                                                              softWrap:
+                                                                                  true,
+                                                                            ),
+                                                                          ),
+                                                                          Padding(
+                                                                            padding: const EdgeInsets
+                                                                                .all(
+                                                                                8.0),
+                                                                            child:
+                                                                                ListView(
+                                                                              physics:
+                                                                                  const BouncingScrollPhysics(),
+                                                                              shrinkWrap:
+                                                                                  true,
+                                                                              addAutomaticKeepAlives:
+                                                                                  true,
+                                                                              children: <Widget>[
+                                                                                Content(
+                                                                                  title: 'Choose Reject Reasons',
+                                                                                  child: ChipsChoice<String>.multiple(
+                                                                                    value: serviceTags,
+                                                                                    onChanged: (val) => setState(() => serviceTags = val),
+                                                                                    choiceItems: C2Choice.listFrom<String, String>(
+                                                                                      source: serviceOptions,
+                                                                                      value: (i, v) => v,
+                                                                                      label: (i, v) => v,
+                                                                                      tooltip: (i, v) => v,
+                                                                                    ),
+                                                                                    choiceCheckmark: true,
+                                                                                    choiceStyle: C2ChipStyle.filled(
+                                                                                      color: Colors.green,
+                                                                                      selectedStyle: const C2ChipStyle(
+                                                                                        borderRadius: BorderRadius.all(
+                                                                                          Radius.circular(25),
+                                                                                        ),
+                                                                                      ),
+                                                                                    ),
+                                                                                    wrapped: true,
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                          Padding(
+                                                                            padding: const EdgeInsets
+                                                                                .all(
+                                                                                8.0),
+                                                                            child:
+                                                                                Form(
+                                                                              key:
+                                                                                  otherServiceKey,
+                                                                              child:
+                                                                                  SizedBox(
+                                                                                width: MediaQuery.of(context).size.width / 1.2,
+                                                                                child: TextFormField(
+                                                                                  validator: (v) {
+                                                                                    if (v!.isEmpty) {
+                                                                                      return "Empty Field";
+                                                                                    } else {
+                                                                                      return null;
+                                                                                    }
+                                                                                  },
+                                                                                  controller: otherService,
+                                                                                  decoration: InputDecoration(fillColor: Colors.grey.shade200, hintText: "Add any other reason", border: InputBorder.none, errorStyle: const TextStyle(color: Colors.red), filled: true, labelStyle: const TextStyle(color: Colors.black)),
+                                                                                ),
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                          Padding(
+                                                                            padding: const EdgeInsets
+                                                                                .all(
+                                                                                8.0),
+                                                                            child: CupertinoButton(
+                                                                                onPressed: () {
+                                                                                  if (otherServiceKey.currentState!.validate()) {
+                                                                                    if (!serviceOptions.contains(otherService.value.text)) {
+                                                                                      serviceTags.add(otherService.value.text);
+                                                                                      serviceOptions.add(otherService.value.text);
+                                                                                      setState(() {});
+                                                                                    }
+                                                                                  }
+                                                                                },
+                                                                                color: Colors.indigoAccent,
+                                                                                child: const Text(
+                                                                                  "Add Reason",
+                                                                                  style: TextStyle(color: Colors.white),
+                                                                                )),
+                                                                          ),
+                                                                          CupertinoButton(
+                                                                              color: Colors
+                                                                                  .red,
+                                                                              onPressed:
+                                                                                  () {
+                                                                                _server.collection("SportistanPartners").doc(snapshot.data!.docChanges[index].doc.id).update({
+                                                                                  'isKYCPending': true,
+                                                                                  'isVerified': false,
+                                                                                  'kycStatus': 'Rejected',
+                                                                                  'rejectReason': serviceTags
+                                                                                }).then((value) async => {
+                                                                                      Navigator.pop(newCtx),
+                                                                                      await deleteAllPhotosInFolder(snapshot, '/groundImages'),
+                                                                                      await _server.collection("DeviceTokens").where('userID', isEqualTo: snapshot.data!.docChanges[index].doc.get("userID")).get().then((v) => {
+                                                                                            Navigator.pop(ctx),
+                                                                                            FirebaseCloudMessaging.sendPushMessage("Your Ground KYC is Rejected Reason are Mentioned in Profile > My Grounds", "We're Sorry", v.docChanges.first.doc.get("token"))
+                                                                                          })
+                                                                                    });
+                                                                              },
+                                                                              child:
+                                                                                  const Text("Reject")),
+                                                                          SizedBox(height: MediaQuery.of(context).size.height/15,)
+                                                                        ],
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                                );
+                                                              },
+                                                            );
+                                                          },
+                                                          child: const Text(
+                                                              "Reject",
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      "DMSans"))),
+                                                    )
+                                                  ],
+                                                ),
                                               );
                                             },
                                           );

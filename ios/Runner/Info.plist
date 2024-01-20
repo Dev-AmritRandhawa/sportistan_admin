@@ -11,6 +11,8 @@
     </dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+    <key>NSContactsUsageDescription</key>
+    <string>instead of typing their number search using pick contact as admin</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
