@@ -81,9 +81,9 @@ android {
         signingConfigs {
             release {
                 storeFile file("C:/Users/amrit/StudioProjects/sportistan_admin/android/app/upload.jks")
-                storePassword "123456"
+                storePassword "android"
                 keyAlias "androiddebugkey"
-                keyPassword "123456"
+                keyPassword "android"
             }
         }
         buildTypes {
