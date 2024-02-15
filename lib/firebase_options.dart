@@ -50,21 +50,21 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDH0xeHQZsZUTtdv2kukd0BOI8Quomkuqw',
-    appId: '1:497512590176:android:fcfd99120b215cc0960c05',
-    messagingSenderId: '497512590176',
-    projectId: 'isportistan',
-    storageBucket: 'isportistan.appspot.com',
+    apiKey: 'AIzaSyB3UX-i3zW0iDWnsaOLHDIN6CeE6IqTBEg',
+    appId: '1:39436193342:android:680290f318be9d79e0cb6f',
+    messagingSenderId: '39436193342',
+    projectId: 'yoursportistan',
+    storageBucket: 'yoursportistan.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyB94dUYY9pXBlkTPbE69bdXfJ32i1z8dS4',
-    appId: '1:497512590176:ios:4ec2230067043c4f960c05',
-    messagingSenderId: '497512590176',
-    projectId: 'isportistan',
-    storageBucket: 'isportistan.appspot.com',
-    androidClientId: '497512590176-114b5bpiq5u8ffuvac5q216vvoniqhtk.apps.googleusercontent.com',
-    iosClientId: '497512590176-rq90n35im3tej6ks21aq68gkvb1n0231.apps.googleusercontent.com',
+    apiKey: 'AIzaSyBRr1EZfSgJavW_hfBYZWXh3EkGkPFmZCc',
+    appId: '1:39436193342:ios:494f8cb4b01427c2e0cb6f',
+    messagingSenderId: '39436193342',
+    projectId: 'yoursportistan',
+    storageBucket: 'yoursportistan.appspot.com',
+    androidClientId: '39436193342-f51m9dcpa43bad00u02lu2ggr593nd89.apps.googleusercontent.com',
+    iosClientId: '39436193342-h9pnv2qf1hm184mnu930hcqotujhjkut.apps.googleusercontent.com',
     iosBundleId: 'co.in.sportistan.sportistanAdmin',
   );
 }
