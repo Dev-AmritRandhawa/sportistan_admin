@@ -30,9 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-
-  # The following adds the Cupertino Icons font to your application.
   cupertino_icons: ^1.0.2
   http: ^1.2.0
   lottie: ^3.0.0
@@ -61,8 +58,7 @@ dependencies:
   collection: ^1.18.0
   animated_text_kit: ^4.2.2
   firebase_messaging: ^14.7.10
-  recaptcha_enterprise_flutter: ^18.4.0
-
+  recaptcha_enterprise_flutter: ^18.4.1
 
 dev_dependencies:
   flutter_test:
